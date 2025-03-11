@@ -1,3 +1,7 @@
+# TanStack Shop with KokonutUI
+
+A minimal shop application built with TanStack and KokonutUI.
+
 Welcome to your new TanStack app! 
 
 # Getting Started
