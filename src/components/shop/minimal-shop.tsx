@@ -1,5 +1,5 @@
 import { AnimatePresence } from "motion/react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { ProductGrid } from "./product-grid";
 import { CartDrawer } from "./cart-drawer";
 import { ProductModal } from "./product-modal";
@@ -8,11 +8,10 @@ import { type Product, type CartItem, products } from "../db/data";
 
 export default function MinimalShop() {
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [selectedProduct, setSelectedProduct] = useState<Product | null>(
-        null
-    );
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
     const [isCartOpen, setIsCartOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedCategory, setSelectedCategory] = useState("All");
 
     const addToCart = (product: Product, quantity: number = 1) => {
         setCart((prev) => {
@@ -46,9 +45,30 @@ export default function MinimalShop() {
         );
     };
 
-    const filteredProducts = products.filter((product) =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredProducts = useMemo(() => {
+        const searchTerms = searchQuery.toLowerCase().split(" ").filter(Boolean);
+        
+        return products.filter((product) => {
+            // Category filter
+            const matchesCategory = selectedCategory === "All" || product.category === selectedCategory;
+            
+            // Search filter
+            if (!searchQuery) return matchesCategory;
+            
+            const searchableText = [
+                product.name,
+                product.category,
+                product.description
+            ].join(" ").toLowerCase();
+            
+            // Match all search terms
+            const matchesSearch = searchTerms.every(term => 
+                searchableText.includes(term)
+            );
+            
+            return matchesCategory && matchesSearch;
+        });
+    }, [searchQuery, selectedCategory]);
 
     return (
         <div className="h-screen bg-zinc-50 dark:bg-zinc-950">
@@ -56,13 +76,24 @@ export default function MinimalShop() {
                 cartItemCount={cart.length}
                 onCartClick={() => setIsCartOpen(true)}
                 onSearch={setSearchQuery}
+                selectedCategory={selectedCategory}
+                onCategoryChange={setSelectedCategory}
             />
 
             <div className="mx-auto px-2 pt-12 pb-16">
-                <ProductGrid
-                    products={filteredProducts}
-                    onProductSelect={setSelectedProduct}
-                />
+                {filteredProducts.length === 0 ? (
+                    <div className="text-center py-12">
+                        <p className="text-zinc-500 dark:text-zinc-400">
+                            No products found{searchQuery ? ` for "${searchQuery}"` : ""} 
+                            {selectedCategory !== "All" ? ` in ${selectedCategory}` : ""}
+                        </p>
+                    </div>
+                ) : (
+                    <ProductGrid
+                        products={filteredProducts}
+                        onProductSelect={setSelectedProduct}
+                    />
+                )}
             </div>
 
             <AnimatePresence>

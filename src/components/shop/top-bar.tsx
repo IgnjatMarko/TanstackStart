@@ -7,6 +7,8 @@ interface TopBarProps {
     cartItemCount: number;
     onCartClick: () => void;
     onSearch: (query: string) => void;
+    selectedCategory: string;
+    onCategoryChange: (category: string) => void;
 }
 
 const categories = [
@@ -19,10 +21,16 @@ const categories = [
     "Textiles",
 ];
 
-export function TopBar({ cartItemCount, onCartClick, onSearch }: TopBarProps) {
+export function TopBar({ 
+    cartItemCount, 
+    onCartClick, 
+    onSearch,
+    selectedCategory,
+    onCategoryChange,
+}: TopBarProps) {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [selectedCategory, setSelectedCategory] = useState("All");
     const [isScrolled, setIsScrolled] = useState(false);
+    const [searchValue, setSearchValue] = useState("");
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -33,11 +41,40 @@ export function TopBar({ cartItemCount, onCartClick, onSearch }: TopBarProps) {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Add keyboard shortcuts for search
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Ctrl/Cmd + K to open search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                setIsSearchOpen(true);
+                searchInputRef.current?.focus();
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, []);
+
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === "Escape") {
             setIsSearchOpen(false);
+            setSearchValue("");
+            onSearch("");
             searchInputRef.current?.blur();
         }
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearchValue(value);
+        onSearch(value);
+    };
+
+    const clearSearch = () => {
+        setSearchValue("");
+        onSearch("");
+        setIsSearchOpen(false);
     };
 
     return (
@@ -51,8 +88,6 @@ export function TopBar({ cartItemCount, onCartClick, onSearch }: TopBarProps) {
             <div className="flex items-center justify-between px-3 h-12">
                 <Link
                     to="/"
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="text-sm font-medium shrink-0"
                 >
                     Shop
@@ -68,7 +103,7 @@ export function TopBar({ cartItemCount, onCartClick, onSearch }: TopBarProps) {
                                     ? "text-zinc-900 dark:text-white text-sm font-medium"
                                     : "text-zinc-500 dark:text-zinc-400 text-sm hover:text-zinc-900 dark:hover:text-white"
                             }`}
-                            onClick={() => setSelectedCategory(category)}
+                            onClick={() => onCategoryChange(category)}
                         >
                             {category}
                         </button>
@@ -76,48 +111,67 @@ export function TopBar({ cartItemCount, onCartClick, onSearch }: TopBarProps) {
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0">
-                    <motion.div
-                        className="relative"
-                        initial={false}
-                        animate={{ width: isSearchOpen ? "auto" : 0 }}
-                    >
-                        <input
-                            ref={searchInputRef}
-                            type="text"
-                            placeholder="Search products..."
-                            className={`w-48 sm:w-56 bg-zinc-100 dark:bg-zinc-800 rounded-md text-sm px-3 py-1.5 
-                                focus:outline-none focus:ring-1 focus:ring-zinc-300 dark:focus:ring-zinc-700
-                                transition-all duration-200 ${
-                                    isSearchOpen ? "opacity-100" : "opacity-0"
-                                }`}
-                            onChange={(e) => onSearch(e.target.value)}
-                            onKeyDown={handleKeyPress}
-                        />
-                        {isSearchOpen && (
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setIsSearchOpen(false);
-                                    onSearch("");
-                                }}
-                                className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 hover:bg-zinc-200 
-                                    dark:hover:bg-zinc-700 rounded-full"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        )}
-                    </motion.div>
-                    <button
-                        type="button"
-                        onClick={() => setIsSearchOpen(!isSearchOpen)}
-                        className={`p-1.5 rounded-md transition-colors ${
-                            isSearchOpen
-                                ? "bg-zinc-100 dark:bg-zinc-800"
-                                : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
-                        }`}
-                    >
-                        <Search className="w-4 h-4" />
-                    </button>
+                    <div className="relative flex items-center">
+                        <motion.div
+                            initial={false}
+                            animate={{
+                                width: isSearchOpen ? 'auto' : '0px',
+                                opacity: isSearchOpen ? 1 : 0
+                            }}
+                            transition={{ duration: 0.2 }}
+                            className="overflow-hidden"
+                        >
+                            <input
+                                ref={searchInputRef}
+                                type="text"
+                                value={searchValue}
+                                placeholder="Search products... (Ctrl + K)"
+                                className="w-48 sm:w-56 bg-zinc-100 dark:bg-zinc-800 rounded-md text-sm px-3 py-1.5 
+                                    focus:outline-none focus:ring-1 focus:ring-zinc-300 dark:focus:ring-zinc-700
+                                    transition-colors overflow-hidden"
+                                onChange={handleSearchChange}
+                                onKeyDown={handleKeyPress}
+                            />
+                            {isSearchOpen && (
+                                <motion.button
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    type="button"
+                                    onClick={clearSearch}
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 p-1 hover:bg-zinc-200 
+                                        dark:hover:bg-zinc-700 rounded-full"
+                                >
+                                    <X className="w-4 h-4" />
+                                </motion.button>
+                            )}
+                        </motion.div>
+                        <motion.button
+                            type="button"
+                            onClick={() => {
+                                setIsSearchOpen(!isSearchOpen);
+                                if (!isSearchOpen) {
+                                    setTimeout(() => searchInputRef.current?.focus(), 100);
+                                } else {
+                                    clearSearch();
+                                }
+                            }}
+                            initial={false}
+                            animate={{
+                                opacity: isSearchOpen ? 0 : 1,
+                                width: isSearchOpen ? 0 : 'auto',
+                                marginLeft: isSearchOpen ? 0 : '0.25rem'
+                            }}
+                            className={`p-1.5 rounded-md transition-colors overflow-hidden ${
+                                isSearchOpen
+                                    ? "bg-zinc-100 dark:bg-zinc-800"
+                                    : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            }`}
+                            aria-label="Toggle search"
+                        >
+                            <Search className="w-4 h-4" />
+                        </motion.button>
+                    </div>
                     <button
                         type="button"
                         onClick={onCartClick}
