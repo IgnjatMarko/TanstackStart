@@ -1,17 +1,19 @@
 import { motion } from "motion/react";
-import { X } from "lucide-react";
+import { X, Plus, Minus } from "lucide-react";
 import { type CartItem } from "../db/data";
 
 interface CartDrawerProps {
     cart: CartItem[];
     onClose: () => void;
     onRemoveFromCart: (productId: string) => void;
+    onUpdateQuantity: (productId: string, quantity: number) => void;
 }
 
 export function CartDrawer({
     cart,
     onClose,
     onRemoveFromCart,
+    onUpdateQuantity,
 }: CartDrawerProps) {
     const total = cart.reduce(
         (sum, item) => sum + item.price * item.quantity,
@@ -69,10 +71,26 @@ export function CartDrawer({
                                             <X className="w-4 h-4" />
                                         </button>
                                     </div>
-                                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-                                        Qty: {item.quantity}
-                                    </p>
-                                    <p className="text-base font-medium mt-1">
+                                    <div className="flex items-center gap-3 mt-2">
+                                        <button
+                                            onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                                            className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                            aria-label="Decrease quantity"
+                                        >
+                                            <Minus className="w-3 h-3" />
+                                        </button>
+                                        <span className="text-sm font-medium w-6 text-center">
+                                            {item.quantity}
+                                        </span>
+                                        <button
+                                            onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                                            className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                            aria-label="Increase quantity"
+                                        >
+                                            <Plus className="w-3 h-3" />
+                                        </button>
+                                    </div>
+                                    <p className="text-base font-medium mt-2">
                                         ${item.price * item.quantity}
                                     </p>
                                 </div>
@@ -83,7 +101,7 @@ export function CartDrawer({
                     <div className="p-4 border-t border-zinc-200 dark:border-zinc-800">
                         <div className="flex justify-between mb-4">
                             <span className="text-base">Total</span>
-                            <span className="text-base font-medium">${total}</span>
+                            <span className="text-base font-medium">${total.toFixed(2)}</span>
                         </div>
                         <button className="w-full py-3 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-base font-medium rounded-lg hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors">
                             Checkout

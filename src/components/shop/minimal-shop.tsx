@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "motion/react";
+import { AnimatePresence } from "motion/react";
 import { useState } from "react";
 import { ProductGrid } from "./product-grid";
 import { CartDrawer } from "./cart-drawer";
@@ -32,6 +32,20 @@ export default function MinimalShop() {
         setCart((prev) => prev.filter((item) => item.id !== productId));
     };
 
+    const updateCartItemQuantity = (productId: string, quantity: number) => {
+        if (quantity < 1) {
+            removeFromCart(productId);
+            return;
+        }
+        setCart((prev) =>
+            prev.map((item) =>
+                item.id === productId
+                    ? { ...item, quantity: Math.min(quantity, 99) }
+                    : item
+            )
+        );
+    };
+
     const filteredProducts = products.filter((product) =>
         product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -56,8 +70,8 @@ export default function MinimalShop() {
                     <ProductModal
                         product={selectedProduct}
                         onClose={() => setSelectedProduct(null)}
-                        onAddToCart={(product) => {
-                            addToCart(product);
+                        onAddToCart={(product, quantity) => {
+                            addToCart(product, quantity);
                             setSelectedProduct(null);
                             setIsCartOpen(true);
                         }}
@@ -71,6 +85,7 @@ export default function MinimalShop() {
                         cart={cart}
                         onClose={() => setIsCartOpen(false)}
                         onRemoveFromCart={removeFromCart}
+                        onUpdateQuantity={updateCartItemQuantity}
                     />
                 )}
             </AnimatePresence>

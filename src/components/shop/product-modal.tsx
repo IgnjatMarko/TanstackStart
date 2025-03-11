@@ -6,7 +6,7 @@ import { type Product } from "../db/data";
 interface ProductModalProps {
     product: Product;
     onClose: () => void;
-    onAddToCart: (product: Product) => void;
+    onAddToCart: (product: Product, quantity: number) => void;
 }
 
 export function ProductModal({
@@ -15,6 +15,14 @@ export function ProductModal({
     onAddToCart,
 }: ProductModalProps) {
     const [quantity, setQuantity] = useState(1);
+
+    const incrementQuantity = () => {
+        setQuantity(prev => Math.min(prev + 1, 99)); // Limiting to 99 items
+    };
+
+    const decrementQuantity = () => {
+        setQuantity(prev => Math.max(prev - 1, 1)); // Minimum 1 item
+    };
 
     return (
         <>
@@ -65,11 +73,32 @@ export function ProductModal({
                                 </div>
                             </div>
                         </div>
+                        
+                        <div className="flex items-center justify-center gap-4 mt-3 mb-2">
+                            <button
+                                onClick={decrementQuantity}
+                                className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                aria-label="Decrease quantity"
+                            >
+                                <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="text-sm font-medium w-8 text-center">
+                                {quantity}
+                            </span>
+                            <button
+                                onClick={incrementQuantity}
+                                className="p-1 rounded-md bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                aria-label="Increase quantity"
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
+
                         <button
-                            onClick={() => onAddToCart(product)}
-                            className="w-full mt-3 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
+                            onClick={() => onAddToCart(product, quantity)}
+                            className="w-full mt-1 py-2 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 text-xs font-medium rounded-md hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
                         >
-                            Add to Cart
+                            Add to Cart ({quantity})
                         </button>
                     </div>
                 </div>
