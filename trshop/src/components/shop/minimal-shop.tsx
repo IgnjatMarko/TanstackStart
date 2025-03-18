@@ -1,5 +1,5 @@
 import { AnimatePresence } from "motion/react";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useQueryState } from "nuqs";
 import { ProductGrid } from "./product-grid";
 import { CartDrawer } from "./cart-drawer";
