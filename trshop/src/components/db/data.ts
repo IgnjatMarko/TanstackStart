@@ -104,7 +104,7 @@ export const products: Product[] = [
     },
     {
         id: "p13",
-        name: "New level hoodie",
+        name: "New Level Hoodie",
         description: "Stylish and comfortable hoodie made from premium cotton blend fabric, perfect for casual wear.",
         price: 100,
         image: "https://scontent.fbeg2-1.fna.fbcdn.net/v/t39.30808-6/463210575_2825733094242212_5778198524129411289_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=cf85f3&_nc_ohc=5HM7MrsNes8Q7kNvgHHjG0x&_nc_oc=AdidKJR-0bYKK4QsuR7KFgxlnKiMwjCsWuG9ZZbra9b7hetg4AmWHPKuxeiLNMTLxEI&_nc_zt=23&_nc_ht=scontent.fbeg2-1.fna&_nc_gid=MEv4Ge-jHuCH5C3xKYW4RA&oh=00_AYGA_51ZqZ9eOQJncdV08cokTS8pxgeroV1AtJcloUw7VQ&oe=67DF4451",
@@ -112,7 +112,7 @@ export const products: Product[] = [
     },
     {
         id: "p14",
-        name: "Savage polo shirt",
+        name: "Savage Polo Shirt",
         description: "Stylish and comfortable polo shirt made from premium cotton blend fabric, perfect for casual wear.",
         price: 80,
         image: "https://scontent.fbeg2-1.fna.fbcdn.net/v/t39.30808-6/463134919_2825587694256752_2069972213385857471_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=cf85f3&_nc_ohc=y4hQe1mLkfYQ7kNvgFDg2XE&_nc_oc=Adi90QFQZC1nX7TFMbtctFrHgXQ4a5pRM6R7quirHSbRujgG3e9FhFJeXqeD0aC-akw&_nc_zt=23&_nc_ht=scontent.fbeg2-1.fna&_nc_gid=F7efUbUMh-HYCTZeX7i-2w&oh=00_AYFqclGEa8IquJAH88eBdDjnNFOVDbAAhRTAU0mbY3_bMA&oe=67DF79AE",
